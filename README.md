@@ -20,6 +20,7 @@ Other features:
 
     <Leader>ado - order dependencies alphabetically
     <Leader>ada - add a new dependency with a prompt for the name
-    <Leader>add - choose to delete a dependency from a list
+    <Leader>adr - choose to remove a dependency from a list
+    <Leader>adc - newly wrap a function with dependency declarations (put your cursor on the f in function)
 
 distributed under the MIT license

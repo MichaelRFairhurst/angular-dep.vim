@@ -15,7 +15,6 @@ fu! InvertString(str)
 	return inverted
 endfu
 
-
 fu! ParseAngularDependencies()
 	let line = getline(".")
 
@@ -84,7 +83,7 @@ fu! AddAngularDependency()
 	call ReplaceAngularDependencies(GenerateAngularDependencies(sort(deps)))
 endfu
 
-fu! DeleteAngularDependency()
+fu! RemoveAngularDependency()
 	let deps = ParseAngularDependencies()
 	let numbereddeps = []
 	let number = 1
@@ -100,4 +99,5 @@ endfu
 map <silent> <Leader>adu :call RegenerateAngularDependencies()<CR>
 map <silent> <Leader>ado :call OrderAngularDependencies()<CR>
 map <silent> <Leader>ada :call AddAngularDependency()<CR>
-map <silent> <Leader>add :call DeleteAngularDependency()<CR>
+map <silent> <Leader>adr :call RemoveAngularDependency()<CR>
+map <silent> <Leader>adc i[<ESC><Leader>aduf{%a]<ESC>h%
