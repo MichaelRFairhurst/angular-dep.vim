@@ -1,5 +1,7 @@
 AngularDep.vim
 
+![Examples](https://raw.githubusercontent.com/MichaelRFairhurst/angular-dep.vim/master/examples.gif "Examples")
+
 Automatically update angular injection syntax with vim:
 
     ["out", "of", "date", "dependencies", function($brand, $new, dependencies, here) {
