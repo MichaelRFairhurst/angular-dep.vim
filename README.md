@@ -8,7 +8,7 @@ Automatically update angular injection syntax with vim:
 
 Simply put your cursor anywhere on the first line, and type
 
-	<Leader>ad
+	<Leader>adu
 
 to have the line updated to
 
@@ -16,5 +16,10 @@ to have the line updated to
 
 Should preserve most if not all formatting in the line.
 
+Other features:
+
+    <Leader>ado - order dependencies alphabetically
+    <Leader>ada - add a new dependency with a prompt for the name
+    <Leader>add - choose to delete a dependency from a list
 
 distributed under the MIT license

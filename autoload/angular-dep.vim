@@ -1,3 +1,11 @@
+let nameregex = '[a-zA-Z_$]\+'
+let qnameregex = '\("' . nameregex . '"\|''' . nameregex . '''\)'
+let injectablesregex = '\[\s*\(' . qnameregex . ',\?\s*\)*'
+let argsregex = '\(\s*' . nameregex . ',\?\)*\s*'
+
+let fnregex = 'function\s*(' . argsregex . '\s*)'
+let exprregex = injectablesregex . fnregex
+
 fu! InvertString(str)
 	" Courtesy of Preben Guldberg
 	" This will invert/reverse a string
@@ -8,46 +16,88 @@ fu! InvertString(str)
 endfu
 
 
-fu! RegenerateAngularDependencies()
-	let place = col(".") - 1
+fu! ParseAngularDependencies()
 	let line = getline(".")
-	while place < len(line) - 8 && strpart(line, place, 8) != "function"
-		let place = place + 1
+
+	let start = match(line, g:exprregex)
+
+	if start == -1
+		echo "Couldn't parse angular dependencies from line"
+		return []
+	endif
+
+	let end = matchend(line, g:exprregex)
+
+	let args = []
+	let place = match(line, g:fnregex, start)
+	let place = matchend(line, 'function', place)
+
+	let argstart = match(line, g:nameregex, place)
+	while argstart != -1 && argstart < end
+		let argend = matchend(line, g:nameregex, place)
+		call add(args, strpart(line, argstart, argend - argstart))
+		let place = argend
+		let argstart = match(line, g:nameregex, place)
 	endwhile
 
-	if place >= len(line) - 8
-		while place >= 0 && strpart(line, place, 8) != "function"
-			let place = place - 1
-		endwhile
-	endif
-
-	let argplace = matchend(line, '^function\s*(', place)
-	if argplace == -1
-		echo "Could not find injectable"
-	else
-		let injectables = []
-		let matchargstart = match(line, '[a-zA-Z_$]\+', argplace)
-
-		while argplace < len(line) && matchargstart != -1
-			let matchargend = matchend(line, '[a-zA-Z_$]\+', argplace)
-			call add(injectables, '"' . strpart(line, matchargstart, matchargend - matchargstart) . '"')
-			let argplace = matchargend
-			let matchargstart = match(line, '[a-zA-Z_$]\+', argplace)
-		endwhile
-
-		let newinjectables = join(injectables, ', ')
-
-		let revprefix = InvertString(strpart(line, 0, place))
-		let revnewinjectables = InvertString('[' . newinjectables . ', ')
-
-		" Backwards regex to find the closest occurence of ['a', 'b', function(...
-		let prefix = InvertString(substitute(revprefix, '^\(\s*,\?\s*\("[a-zA-Z_$]\+"\|''[a-zA-Z_$]\+''\)\)*\s*\[', revnewinjectables, ''))
-
-		let newLine = prefix . strpart(line, place)
-
-		call setline('.', newLine)
-	endif
-
+	return args
 endfu
 
-map <silent> <Leader>ad :call RegenerateAngularDependencies()<CR>
+fu! ReplaceAngularDependencies(newcontent)
+	call setline('.', substitute(getline('.'), g:exprregex, a:newcontent, ''))
+endfu
+
+fu! GenerateAngularDependencies(arglist)
+	let generated = '['
+	let quoted = []
+
+	for an_arg in a:arglist
+		call add(quoted, '"' . an_arg . '"')
+	endfor
+
+	let generated = generated . join(quoted, ", ")
+
+	if len(quoted)
+		let generated = generated . ", "
+	endif
+
+	let generated = generated . "function("
+	let generated = generated . join(a:arglist, ", ")
+	let generated = generated . ")"
+
+	return generated
+endfu
+
+fu! RegenerateAngularDependencies()
+	call ReplaceAngularDependencies(GenerateAngularDependencies(ParseAngularDependencies()))
+endfu
+
+fu! OrderAngularDependencies()
+	call ReplaceAngularDependencies(GenerateAngularDependencies(sort(ParseAngularDependencies())))
+endfu
+
+fu! AddAngularDependency()
+	let deps = ParseAngularDependencies()
+	let newdep = input('Enter Injectable Name: ')
+	call add(deps, newdep)
+
+	call ReplaceAngularDependencies(GenerateAngularDependencies(sort(deps)))
+endfu
+
+fu! DeleteAngularDependency()
+	let deps = ParseAngularDependencies()
+	let numbereddeps = []
+	let number = 1
+	for dep in deps
+		call add(numbereddeps, number . ' ' . dep)
+		let number = number + 1
+	endfor
+	let selected = inputlist(numbereddeps)
+	call remove(deps, selected - 1)
+	call ReplaceAngularDependencies(GenerateAngularDependencies(sort(deps)))
+endfu
+
+map <silent> <Leader>adu :call RegenerateAngularDependencies()<CR>
+map <silent> <Leader>ado :call OrderAngularDependencies()<CR>
+map <silent> <Leader>ada :call AddAngularDependency()<CR>
+map <silent> <Leader>add :call DeleteAngularDependency()<CR>
