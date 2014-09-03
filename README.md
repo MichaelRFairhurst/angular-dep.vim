@@ -26,3 +26,7 @@ Other features:
     <Leader>adc - newly wrap a function with dependency declarations (put your cursor on the f in function)
 
 distributed under the MIT license
+
+Installing:
+
+If you have pathogen, simply `git clone git@github.com:MichaelRFairhurst/angular-dep.vim.git` within `~/.vim/bundle`. Otherwise copy javascript.vim into `~/.vim/ftplugin/javascript.vim`.
