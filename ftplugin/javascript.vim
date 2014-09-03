@@ -1,10 +1,10 @@
-let nameregex = '[a-zA-Z_$]\+'
-let qnameregex = '\("' . nameregex . '"\|''' . nameregex . '''\)'
-let injectablesregex = '\[\s*\(' . qnameregex . ',\?\s*\)*'
-let argsregex = '\(\s*' . nameregex . ',\?\)*\s*'
+let _ad_nameregex = '[a-zA-Z_$]\+'
+let _ad_qnameregex = '\("' . _ad_nameregex . '"\|''' . _ad_nameregex . '''\)'
+let _ad_injectablesregex = '\[\s*\(' . _ad_qnameregex . ',\?\s*\)*'
+let _ad_argsregex = '\(\s*' . _ad_nameregex . ',\?\)*\s*'
 
-let fnregex = 'function\s*(' . argsregex . '\s*)'
-let exprregex = injectablesregex . fnregex
+let _ad_fnregex = 'function\s*(' . _ad_argsregex . '\s*)'
+let _ad_exprregex = _ad_injectablesregex . _ad_fnregex
 
 fu! InvertString(str)
 	" Courtesy of Preben Guldberg
@@ -18,32 +18,32 @@ endfu
 fu! ParseAngularDependencies()
 	let line = getline(".")
 
-	let start = match(line, g:exprregex)
+	let start = match(line, g:_ad_exprregex)
 
 	if start == -1
 		echo "Couldn't parse angular dependencies from line"
 		return []
 	endif
 
-	let end = matchend(line, g:exprregex)
+	let end = matchend(line, g:_ad_exprregex)
 
 	let args = []
-	let place = match(line, g:fnregex, start)
+	let place = match(line, g:_ad_fnregex, start)
 	let place = matchend(line, 'function', place)
 
-	let argstart = match(line, g:nameregex, place)
+	let argstart = match(line, g:_ad_nameregex, place)
 	while argstart != -1 && argstart < end
-		let argend = matchend(line, g:nameregex, place)
+		let argend = matchend(line, g:_ad_nameregex, place)
 		call add(args, strpart(line, argstart, argend - argstart))
 		let place = argend
-		let argstart = match(line, g:nameregex, place)
+		let argstart = match(line, g:_ad_nameregex, place)
 	endwhile
 
 	return args
 endfu
 
 fu! ReplaceAngularDependencies(newcontent)
-	call setline('.', substitute(getline('.'), g:exprregex, a:newcontent, ''))
+	call setline('.', substitute(getline('.'), g:_ad_exprregex, a:newcontent, ''))
 endfu
 
 fu! GenerateAngularDependencies(arglist)
