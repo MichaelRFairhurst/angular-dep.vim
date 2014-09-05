@@ -6,6 +6,8 @@ let _ad_argsregex = '\(\s*' . _ad_nameregex . ',\?\)*\s*'
 let _ad_fnregex = 'function\s*(' . _ad_argsregex . '\s*)'
 let _ad_exprregex = _ad_injectablesregex . _ad_fnregex
 
+if !exists('g:angular_dep_quote') | let g:angular_dep_quote = "'" | endif
+
 fu! InvertString(str)
 	" Courtesy of Preben Guldberg
 	" This will invert/reverse a string
@@ -51,7 +53,7 @@ fu! GenerateAngularDependencies(arglist)
 	let quoted = []
 
 	for an_arg in a:arglist
-		call add(quoted, '"' . an_arg . '"')
+		call add(quoted, g:angular_dep_quote . an_arg . g:angular_dep_quote)
 	endfor
 
 	let generated = generated . join(quoted, ", ")
@@ -85,7 +87,7 @@ endfu
 
 fu! RemoveAngularDependency()
 	let deps = ParseAngularDependencies()
-	let numbereddeps = []
+	let numbereddeps = ["Select a dependency to remove:"]
 	let number = 1
 	for dep in deps
 		call add(numbereddeps, number . ' ' . dep)
