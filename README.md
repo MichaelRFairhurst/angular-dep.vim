@@ -30,3 +30,10 @@ distributed under the MIT license
 Installing:
 
 If you have pathogen, simply `git clone git@github.com:MichaelRFairhurst/angular-dep.vim.git` within `~/.vim/bundle`. Otherwise copy javascript.vim into `~/.vim/ftplugin/javascript.vim`.
+
+Configuring:
+
+Currently the only option is to change single quotes or double quotes by defining the following in your .vimrc
+
+    let g:angular_dep_quote = '"'
+
