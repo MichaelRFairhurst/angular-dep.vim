@@ -1,4 +1,4 @@
-let _ad_nameregex = '[a-zA-Z_$]\+'
+let _ad_nameregex = '[a-zA-Z_$0-9]\+'
 let _ad_qnameregex = '\("' . _ad_nameregex . '"\|''' . _ad_nameregex . '''\)'
 let _ad_injectablesregex = '\[\s*\(' . _ad_qnameregex . ',\?\s*\)*'
 let _ad_argsregex = '\(\s*' . _ad_nameregex . ',\?\)*\s*'
